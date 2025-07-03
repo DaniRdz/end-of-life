@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-from requests_html import HTMLSession
 from datetime import datetime
 import requests
 import csv
@@ -21,10 +20,6 @@ eol_products = ['apache',
                 'postgresql',
                 'python',
                 'sonar']
-
-eol_urls = ['https://www.ibm.com/support/pages/lifecycle/search/?q=cognos%20analytics',
-            'https://www.ibm.com/support/pages/lifecycle/search?q=IBM%20InfoSphere%20Information%20Server', 
-            'https://www.ibm.com/support/pages/lifecycle/search/?q=rational%20clearquest']
 
 eol_info = []
 
@@ -100,36 +95,9 @@ def get_eol_info(eol_product):
         
         append_eol_info(mw_name, version, released, date_count, latest_version, latest_version_released, eol)
 
-def get_eol_url_info(eol_url):
-    session = HTMLSession()
-    page = session.get(eol_url)
-    page.html.render()
-    trs = page.html.find('tr')
-    today = datetime.now()
-    date_count = ''
-
-    for tr in trs:
-        tds = tr.find('td')
-        if len(tds) > 0:
-            mw_name = tds[1].text
-            version = tds[2].text
-            released = format_date(tds[5].text)
-            eol = tds[6].text
-
-            latest_version = ''
-            latest_version_released = ''
-
-            if eol != '':
-                diff_days_eol = (today - datetime.strptime(eol, '%Y-%m-%d'))
-                date_count = format_time_difference(diff_days_eol)
-            append_eol_info(mw_name, version, released, date_count, latest_version,latest_version_released, eol)
-
     
 for eol_product in eol_products:
     get_eol_info(eol_product)
-
-#for eol_url in eol_urls:
-#    get_eol_url_info(eol_url)
 
 keys = eol_info[0].keys()
 
